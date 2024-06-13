@@ -28,7 +28,7 @@ class ThemeProvider extends StatefulWidget {
 class _ThemeProviderState extends State<ThemeProvider>
     with TickerProviderStateMixin {
   late AnimationController _controller;
-  late var model;
+  late ThemeModel model;
 
   @override
   void initState() {
@@ -42,6 +42,12 @@ class _ThemeProviderState extends State<ThemeProvider>
       startTheme: widget.initTheme,
       controller: _controller,
     );
+  }
+
+  @override
+  void dispose() {
+    model.dispose();
+    super.dispose();
   }
 
   @override
