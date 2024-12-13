@@ -16,9 +16,7 @@ class ThemeSwitchingArea extends StatelessWidget {
     final model = ThemeModelInheritedNotifier.of(context);
     // Widget resChild;
     Widget child;
-    if (model.oldTheme == null ||
-        model.oldTheme == model.theme ||
-        !model.controller.isAnimating) {
+    if (model.oldTheme == null || model.oldTheme == model.theme) {
       child = _getPage(model.theme);
     } else {
       late final Widget firstWidget, animWidget;
@@ -29,12 +27,14 @@ class ThemeSwitchingArea extends StatelessWidget {
         firstWidget = RawImage(image: model.image);
         animWidget = _getPage(model.theme);
       }
+
       child = Stack(
         children: [
-          Container(
-            key: ValueKey('ThemeSwitchingAreaFirstChild'),
-            child: firstWidget,
-          ),
+          if (model.isAnimating)
+            Container(
+              key: ValueKey('ThemeSwitchingAreaFirstChild'),
+              child: firstWidget,
+            ),
           AnimatedBuilder(
             key: ValueKey('ThemeSwitchingAreaSecondChild'),
             animation: model.controller,

@@ -28,7 +28,7 @@ class ThemeProvider extends StatefulWidget {
 class _ThemeProviderState extends State<ThemeProvider>
     with TickerProviderStateMixin {
   late AnimationController _controller;
-  late var model;
+  late ThemeModel model;
 
   @override
   void initState() {
@@ -42,6 +42,12 @@ class _ThemeProviderState extends State<ThemeProvider>
       startTheme: widget.initTheme,
       controller: _controller,
     );
+  }
+
+  @override
+  void dispose() {
+    model.dispose();
+    super.dispose();
   }
 
   @override
@@ -93,6 +99,7 @@ class ThemeModel extends ChangeNotifier {
   ThemeData? oldTheme;
 
   bool isReversed = false;
+  bool isAnimating = false;
   late Offset switcherOffset;
 
   void changeTheme({
@@ -117,17 +124,23 @@ class ThemeModel extends ChangeNotifier {
     switcherOffset = _getSwitcherCoordinates(key, offset);
     await _saveScreenshot();
 
+    isAnimating = true;
+
     if (isReversed) {
-      await controller
-          .reverse(from: 1.0)
-          .then((value) => onAnimationFinish?.call());
+      await controller.reverse(from: 1.0).then(
+        (value) {
+          isAnimating = false;
+          onAnimationFinish?.call();
+        },
+      );
     } else {
-      await controller
-          .forward(from: 0.0)
-          .then((value) => onAnimationFinish?.call());
+      await controller.forward(from: 0.0).then(
+        (value) {
+          isAnimating = false;
+          onAnimationFinish?.call();
+        },
+      );
     }
-    // Notify listeners when the animation finishes.
-    notifyListeners();
   }
 
   Future<void> _saveScreenshot() async {
